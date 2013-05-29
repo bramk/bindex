@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Stack;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.launch.Framework;
@@ -133,7 +134,24 @@ public class Index {
 				} else if (args[i].startsWith("-")) {
 					throw new Exception("Unknown argument");
 				} else {
-					fileList.add(new File(args[i]));
+					File fileArg = new File(args[i]);
+					if (fileArg.isDirectory()) {
+						Stack<File> dirs = new Stack<File>();
+						dirs.push(fileArg);
+						while (!dirs.isEmpty()) {
+							File dir = dirs.pop();
+							File[] files = dir.listFiles();
+							for (File file : files) {
+								if (file.isDirectory()) {
+									dirs.push(file);
+								} else {
+									fileList.add(file);
+								}
+							}
+						}
+					} else {
+						fileList.add(fileArg);
+					}
 				}
 			} catch (Exception e) {
 				System.err.println("Error in " + args[i] + " : " + e.getMessage());
@@ -186,6 +204,6 @@ public class Index {
 						+ "  [-l file:license.html]                                           --> Licence file.%n"
 						+ "  [-v]                                                             --> Verbose reporting.%n"
 						+ "  [-stylesheet http://www.osgi.org/www/obr2html.xsl]               --> Stylesheet URL.%n"
-						+ "  <file> [<file>*]%n");
+						+ "  <file|dir> [<file|dir>*]%n");
 	}
 }
