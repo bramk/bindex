@@ -129,6 +129,7 @@ public class Index {
 					config.put("-repository.increment.override", "");
 				} else if (args[i].startsWith("-h")) {
 					printUsage();
+					System.exit(0);
 				} else if (args[i].startsWith("-")) {
 					throw new Exception("Unknown argument");
 				} else {
