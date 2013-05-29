@@ -175,6 +175,7 @@ public class Index {
 	private static void printUsage() {
 		System.err
 				.printf("Arguments:%n" //
+						+ "  [-h]                                                             --> Print usage information.%n" //
 						+ "  [-r index.xml(.gz)]                                              --> Output file name.%n" //
 						+ "  [--pretty]                                                       --> Non-compressed, indented output.%n" //
 						+ "  [-n Untitled]                                                    --> Repository name.%n"
