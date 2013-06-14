@@ -41,7 +41,7 @@ class JarResource implements Resource {
 		properties.put(LOCATION, location);
 		properties.put(SIZE, file.length());
 		properties.put(LAST_MODIFIED, file.lastModified());
-		properties.put(MIMETYPE, "");
+		properties.put(MIMETYPE, MimeType.Jar.toString());
 		
 		Enumeration<JarEntry> entries = jarFile.entries();
 		while (entries.hasMoreElements()) {
