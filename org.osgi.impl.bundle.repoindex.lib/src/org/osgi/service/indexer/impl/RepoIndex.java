@@ -186,8 +186,10 @@ public class RepoIndex implements ResourceIndexer {
 			
 			String urlTemplate = config.get(ResourceIndexer.URL_TEMPLATE);
 			bundleAnalyzer.setStateLocal(new GeneratorState(rootURL, urlTemplate));
+			defaultAnalyzer.setStateLocal(new GeneratorState(rootURL, urlTemplate));
 		} else {
 			bundleAnalyzer.setStateLocal(null);
+			defaultAnalyzer.setStateLocal(null);
 		}
 		
 		// Iterate over the analyzers
