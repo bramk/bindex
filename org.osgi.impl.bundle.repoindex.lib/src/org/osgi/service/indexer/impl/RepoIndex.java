@@ -21,8 +21,10 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.indexer.Capability;
 import org.osgi.service.indexer.Requirement;
+import org.osgi.service.indexer.Resource;
 import org.osgi.service.indexer.ResourceAnalyzer;
 import org.osgi.service.indexer.ResourceIndexer;
+import org.osgi.service.indexer.ResourceRecognizer;
 import org.osgi.service.indexer.impl.types.TypedAttribute;
 import org.osgi.service.indexer.impl.util.AddOnlyList;
 import org.osgi.service.indexer.impl.util.Indent;
@@ -38,9 +40,11 @@ public class RepoIndex implements ResourceIndexer {
 	private final OSGiFrameworkAnalyzer frameworkAnalyzer;
 	private final SCRAnalyzer scrAnalyzer;
 	private final BlueprintAnalyzer blueprintAnalyzer;
+	private final DefaultAnalyzer defaultAnalyzer;
 	
 	private final LogService log;
 	
+	private final List<ResourceRecognizer> recognizers = new LinkedList<ResourceRecognizer>();
 	private final List<Pair<ResourceAnalyzer, Filter>> analyzers = new LinkedList<Pair<ResourceAnalyzer,Filter>>();
 	
 	public RepoIndex() {
@@ -54,14 +58,20 @@ public class RepoIndex implements ResourceIndexer {
 		this.frameworkAnalyzer = new OSGiFrameworkAnalyzer(log);
 		this.scrAnalyzer = new SCRAnalyzer(log);
 		this.blueprintAnalyzer = new BlueprintAnalyzer(log);
+		this.defaultAnalyzer = new DefaultAnalyzer(log);
+
+		addRecognizer(new DefaultRecognizer(log));
+		addRecognizer(new MetaTypeRecognizer(log));
 		
 		try {
-			Filter allFilter = createFilter("(name=*.jar)");
+			Filter jarFilter = createFilter("(|(" + Resource.MIMETYPE + "=" + MimeType.Jar.toString() + ")(" + Resource.MIMETYPE + "=" + MimeType.Bundle.toString() + "))");
+			Filter fileFilter = createFilter("(!(|(" + Resource.MIMETYPE + "=" + MimeType.Jar.toString() + ")(" + Resource.MIMETYPE + "=" + MimeType.Bundle.toString() + ")))");
 			
-			addAnalyzer(bundleAnalyzer, allFilter);
-			addAnalyzer(frameworkAnalyzer, allFilter);
-			addAnalyzer(scrAnalyzer, allFilter);
-			addAnalyzer(blueprintAnalyzer, allFilter);
+			addAnalyzer(bundleAnalyzer, jarFilter);
+			addAnalyzer(frameworkAnalyzer, jarFilter);
+			addAnalyzer(scrAnalyzer, jarFilter);
+			addAnalyzer(blueprintAnalyzer, jarFilter);
+			addAnalyzer(defaultAnalyzer, fileFilter);
 
 		} catch (InvalidSyntaxException e) {
 			// Can't happen...?
@@ -78,6 +88,18 @@ public class RepoIndex implements ResourceIndexer {
 	public final void removeAnalyzer(ResourceAnalyzer analyzer, Filter filter) {
 		synchronized (analyzers) {
 			analyzers.remove(Pair.create(analyzer, filter));
+		}
+	}
+
+	public final void addRecognizer(ResourceRecognizer recognizer) {
+		synchronized (recognizers) {
+			recognizers.add(recognizer);
+		}
+	}
+	
+	public final void removeRecognizer(ResourceRecognizer recognizer) {
+		synchronized (recognizers) {
+			recognizers.remove(recognizer);
 		}
 	}
 
@@ -132,9 +154,19 @@ public class RepoIndex implements ResourceIndexer {
 		}
 	}
 	
+	
 	private Tag generateResource(File file, Map<String, String> config) throws Exception {
+
+		Resource resource = null;
+		synchronized (recognizers) {
+			for(ResourceRecognizer recognizer : recognizers){
+				resource = recognizer.recognizeResource(file, resource);
+			}
+		}
+		if(resource == null){
+			throw new IllegalStateException("Failed to recognize resource: " + file.getAbsolutePath());
+		}
 		
-		JarResource resource = new JarResource(file);
 		List<Capability> caps = new AddOnlyList<Capability>(new LinkedList<Capability>());
 		List<Requirement> reqs = new AddOnlyList<Requirement>(new LinkedList<Requirement>());
 		

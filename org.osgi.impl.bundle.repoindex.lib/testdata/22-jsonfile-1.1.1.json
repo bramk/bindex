@@ -1,0 +1,32 @@
+<MetaData xmlns="http://www.osgi.org/xmlns/metatype/v1.0.0">
+  <OCD name='ocd' id='ocd'>
+    <AD id='org.osgi.service.http.port' type='STRING' cardinality='0' />
+    <AD id='org.osgi.service.http.port.secure' type='STRING' cardinality='0' />
+    <AD id='org.apache.felix.http.debug' type='STRING' cardinality='0' />
+    <AD id='org.apache.felix.log.storeDebug' type='STRING' cardinality='0' />
+    <AD id="org.apache.felix.http.timeout" type="STRING" cardinality='0'/>
+    <AD id='org.apache.felix.http.enable' type='STRING' cardinality='0' />
+    <AD id='org.apache.felix.https.enable' type='STRING' cardinality='0' />
+    <AD id='org.apache.felix.https.keystore' type='STRING' cardinality='0' />
+    <AD id='org.apache.felix.https.keystore.password' type='STRING' cardinality='0' />
+  </OCD>
+  <Designate pid='org.apache.felix.http' bundle="osgi-dp:org.apache.felix.http.jetty">
+    <Object ocdref='ocd'>
+      <Attribute adref='org.osgi.service.http.port'>
+        <Value><![CDATA[8080]]></Value>
+      </Attribute>
+      <Attribute adref='org.apache.felix.http.debug'>
+        <Value><![CDATA[true]]></Value>
+      </Attribute>
+      <Attribute adref='org.apache.felix.log.storeDebug'>
+        <Value><![CDATA[true]]></Value>
+      </Attribute>
+      <Attribute adref='org.apache.felix.http.timeout'>
+        <Value><![CDATA[600000]]></Value>
+      </Attribute>
+      <Attribute adref='org.apache.felix.http.enable'>
+        <Value><![CDATA[true]]></Value>
+      </Attribute>
+    </Object>
+  </Designate>
+</MetaData>

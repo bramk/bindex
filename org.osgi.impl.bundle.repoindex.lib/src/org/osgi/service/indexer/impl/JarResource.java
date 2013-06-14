@@ -24,7 +24,7 @@ class JarResource implements Resource {
 	private final JarFile jarFile;
 	private final String location;
 	
-	private final Dictionary<String, Object>properties = new Hashtable<String, Object>();
+	private final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 	
 	private final Map<String, List<JarEntry>> prefixMap = new HashMap<String, List<JarEntry>>();
 	private final Map<String, JarEntry> paths = new HashMap<String, JarEntry>();
@@ -41,6 +41,7 @@ class JarResource implements Resource {
 		properties.put(LOCATION, location);
 		properties.put(SIZE, file.length());
 		properties.put(LAST_MODIFIED, file.lastModified());
+		properties.put(MIMETYPE, "");
 		
 		Enumeration<JarEntry> entries = jarFile.entries();
 		while (entries.hasMoreElements()) {
@@ -79,6 +80,10 @@ class JarResource implements Resource {
 			prefixMap.put(prefix, list);
 		}
 		return list;
+	}
+
+	public String getMimeType(){
+		return (String) properties.get(Resource.MIMETYPE);
 	}
 	
 	public String getLocation() {
@@ -142,5 +147,4 @@ class JarResource implements Resource {
 			// Don't care
 		}
 	}
-
 }

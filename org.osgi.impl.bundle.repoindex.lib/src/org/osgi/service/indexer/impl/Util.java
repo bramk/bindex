@@ -24,6 +24,7 @@ import org.osgi.service.indexer.impl.util.QuotedTokenizer;
 
 public class Util {
 	
+	// TODO will not work on non jars. Move responsibility to Resource(Recognizer)
 	public static SymbolicName getSymbolicName(Resource resource) throws IOException {
 		Manifest manifest = resource.getManifest();
 		if (manifest == null)
@@ -41,6 +42,7 @@ public class Util {
 		return new SymbolicName(entry.getKey(), entry.getValue());
 	}
 	
+	// TODO will not work on non jars. Move responsibility to Resource(Recognizer)
 	public static Version getVersion(Resource resource) throws IOException {
 		Manifest manifest = resource.getManifest();
 		if (manifest == null)
@@ -50,6 +52,7 @@ public class Util {
 		return version;
 	}
 
+	// TODO will not work on non jars. Move responsibility to Resource(Recognizer)
 	public static MimeType getMimeType(Resource resource) throws IOException {
 		Manifest manifest = resource.getManifest();
 		if (manifest == null)
@@ -64,8 +67,6 @@ public class Util {
 		
 		return MimeType.Bundle;
 	}
-
-
 
 	public static void addVersionFilter(StringBuilder filter, VersionRange version, VersionKey key) {
 		if (version.isRange()) {
@@ -236,5 +237,4 @@ public class Util {
 		
 		return result;
 	}
-
 }

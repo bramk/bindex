@@ -12,6 +12,9 @@ public interface Resource {
 	static String LOCATION = "location";
 	static String SIZE = "size";
 	static String LAST_MODIFIED = "lastmodified";
+	static String MIMETYPE = "mimetype";
+	
+	String getMimeType();
 	
 	String getLocation();
 	

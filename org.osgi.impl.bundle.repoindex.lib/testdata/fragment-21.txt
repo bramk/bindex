@@ -1,0 +1,12 @@
+<resource>
+  <capability namespace='osgi.identity'>
+    <attribute name='osgi.identity' value='21-metatypefile'/>
+    <attribute name='type' value='file'/>
+  </capability>
+  <capability namespace='osgi.content'>
+    <attribute name='osgi.content' value='3c36a200ae07395a9d86a2ae0e94bb1f6b70b81f04c6be5d7b4ab7d7cf076620'/>
+    <attribute name='url' value='testdata/21-metatypefile.xml'/>
+    <attribute name='size' type='Long' value='1520'/>
+    <attribute name='mime' value='application/xml:osgi-autoconf'/>
+  </capability>
+</resource>

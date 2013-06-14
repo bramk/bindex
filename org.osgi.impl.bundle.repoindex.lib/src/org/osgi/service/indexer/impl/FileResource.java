@@ -1,5 +1,7 @@
 package org.osgi.service.indexer.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Dictionary;
@@ -9,35 +11,42 @@ import java.util.jar.Manifest;
 
 import org.osgi.service.indexer.Resource;
 
-class FlatStreamResource implements Resource {
-	
+class FileResource implements Resource {
+
+	private final File file;
 	private final String location;
-	private final InputStream stream;
 
-	private final Dictionary<String, Object>properties = new Hashtable<String, Object>();
+	private final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 
-	FlatStreamResource(String name, String location, InputStream stream) {
-		this.location = location;
-		this.stream = stream;
-		
-		properties.put(NAME, name);
+	public FileResource(File file) {
+
+		this.file = file;
+		location = file.getPath();
+		properties.put(NAME, file.getName());
 		properties.put(LOCATION, location);
+		properties.put(SIZE, file.length());
+		properties.put(LAST_MODIFIED, file.lastModified());
+		properties.put(MIMETYPE, MimeType.Unknown.toString());
 	}
-	
+
+	public String getMimeType() {
+		return (String) properties.get(Resource.MIMETYPE);
+	}
+
 	public String getLocation() {
 		return location;
 	}
-	
+
 	public Dictionary<String, Object> getProperties() {
 		return properties;
 	}
-	
+
 	public long getSize() {
-		return 0L;
+		return file.length();
 	}
 
 	public InputStream getStream() throws IOException {
-		return stream;
+		return new FileInputStream(file);
 	}
 
 	public Manifest getManifest() throws IOException {
@@ -53,9 +62,5 @@ class FlatStreamResource implements Resource {
 	}
 
 	public void close() {
-	}
-
-	public String getMimeType() {
-		return (String) properties.get(Resource.MIMETYPE);
 	}
 }
