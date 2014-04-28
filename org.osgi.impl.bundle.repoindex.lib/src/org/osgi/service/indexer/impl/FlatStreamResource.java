@@ -55,4 +55,7 @@ class FlatStreamResource implements Resource {
 	public void close() {
 	}
 
+	public String getMimeType() {
+		return null;
+	}
 }

@@ -25,6 +25,14 @@ public interface Resource {
 	/** the name of the lastmodified attribute */
 	static String LAST_MODIFIED = "lastmodified";
 
+	/** the name of the mimetype attribute */
+	static String MIMETYPE = "mimetype";
+
+	/**
+	 * @return the value for the mimetype attribute
+	 */
+	String getMimeType();
+
 	/**
 	 * @return the value for the location attribute
 	 */

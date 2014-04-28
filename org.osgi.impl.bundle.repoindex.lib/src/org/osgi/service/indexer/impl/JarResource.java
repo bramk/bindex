@@ -41,6 +41,7 @@ public class JarResource implements Resource {
 		properties.put(LOCATION, location);
 		properties.put(SIZE, file.length());
 		properties.put(LAST_MODIFIED, file.lastModified());
+		properties.put(MIMETYPE, MimeType.Jar.toString());
 
 		Enumeration<JarEntry> entries = jarFile.entries();
 		while (entries.hasMoreElements()) {
@@ -79,6 +80,10 @@ public class JarResource implements Resource {
 			prefixMap.put(prefix, list);
 		}
 		return list;
+	}
+
+	public String getMimeType() {
+		return (String) properties.get(Resource.MIMETYPE);
 	}
 
 	public String getLocation() {
