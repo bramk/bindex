@@ -26,8 +26,10 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.indexer.Capability;
 import org.osgi.service.indexer.Requirement;
+import org.osgi.service.indexer.Resource;
 import org.osgi.service.indexer.ResourceAnalyzer;
 import org.osgi.service.indexer.ResourceIndexer;
+import org.osgi.service.indexer.ResourceRecognizer;
 import org.osgi.service.indexer.impl.types.TypedAttribute;
 import org.osgi.service.indexer.impl.util.AddOnlyList;
 import org.osgi.service.indexer.impl.util.Indent;
@@ -57,8 +59,16 @@ public class RepoIndex implements ResourceIndexer {
 	/** the BluePrint analyzer */
 	private final BlueprintAnalyzer blueprintAnalyzer;
 
+	/** the default analyzer */
+	private final DefaultAnalyzer defaultAnalyzer;
+
 	/** the logger */
 	private final LogService log;
+
+	/**
+	 * the list of recognizers.
+	 */
+	private final List<ResourceRecognizer> recognizers = new LinkedList<ResourceRecognizer>();
 
 	/**
 	 * the list of analyzer/filter pairs. The filter determines which resources
@@ -86,14 +96,18 @@ public class RepoIndex implements ResourceIndexer {
 		this.frameworkAnalyzer = new OSGiFrameworkAnalyzer(log);
 		this.scrAnalyzer = new SCRAnalyzer(log);
 		this.blueprintAnalyzer = new BlueprintAnalyzer(log);
+		this.defaultAnalyzer = new DefaultAnalyzer(log);
 
+		addRecognizer(new DefaultRecognizer(log));
 		try {
-			Filter allFilter = createFilter("(name=*.jar)");
+			Filter jarFilter = createFilter("(|(" + Resource.MIMETYPE + "=" + MimeType.Jar.toString() + ")(" + Resource.MIMETYPE + "=" + MimeType.Bundle.toString() + "))");
+			Filter fileFilter = createFilter("(!(|(" + Resource.MIMETYPE + "=" + MimeType.Jar.toString() + ")(" + Resource.MIMETYPE + "=" + MimeType.Bundle.toString() + ")))");
 
-			addAnalyzer(bundleAnalyzer, allFilter);
-			addAnalyzer(frameworkAnalyzer, allFilter);
-			addAnalyzer(scrAnalyzer, allFilter);
-			addAnalyzer(blueprintAnalyzer, allFilter);
+			addAnalyzer(bundleAnalyzer, jarFilter);
+			addAnalyzer(frameworkAnalyzer, jarFilter);
+			addAnalyzer(scrAnalyzer, jarFilter);
+			addAnalyzer(blueprintAnalyzer, jarFilter);
+			addAnalyzer(defaultAnalyzer, fileFilter);
 		} catch (InvalidSyntaxException e) {
 			throw new ExceptionInInitializerError("Unexpected internal error compiling filter");
 		}
@@ -120,6 +134,26 @@ public class RepoIndex implements ResourceIndexer {
 	public final void removeAnalyzer(ResourceAnalyzer analyzer, Filter filter) {
 		synchronized (analyzers) {
 			analyzers.remove(Pair.create(analyzer, filter));
+		}
+	}
+
+	/**
+	 * @param recognizer
+	 *            the recognizer to add
+	 */
+	public final void addRecognizer(ResourceRecognizer recognizer) {
+		synchronized (recognizers) {
+			recognizers.add(recognizer);
+		}
+	}
+
+	/**
+	 * @param recognizer
+	 *            the recognizer to remove
+	 */
+	public final void removeRecognizer(ResourceRecognizer recognizer) {
+		synchronized (recognizers) {
+			recognizers.remove(recognizer);
 		}
 	}
 
@@ -230,7 +264,16 @@ public class RepoIndex implements ResourceIndexer {
 
 	private Tag generateResource(File file, Map<String, String> config) throws Exception {
 
-		JarResource resource = new JarResource(file);
+		Resource resource = null;
+		synchronized (recognizers) {
+			for (ResourceRecognizer recognizer : recognizers) {
+				resource = recognizer.recognizeResource(file, resource);
+			}
+		}
+		if (resource == null) {
+			throw new IllegalStateException("Failed to recognize resource: " + file.getAbsolutePath());
+		}
+
 		List<Capability> caps = new AddOnlyList<Capability>(new LinkedList<Capability>());
 		List<Requirement> reqs = new AddOnlyList<Requirement>(new LinkedList<Requirement>());
 
@@ -250,8 +293,10 @@ public class RepoIndex implements ResourceIndexer {
 
 				String urlTemplate = config.get(ResourceIndexer.URL_TEMPLATE);
 				bundleAnalyzer.setStateLocal(new GeneratorState(rootURL, urlTemplate));
+				defaultAnalyzer.setStateLocal(new GeneratorState(rootURL, urlTemplate));
 			} else {
 				bundleAnalyzer.setStateLocal(null);
+				defaultAnalyzer.setStateLocal(null);
 			}
 
 			// Iterate over the analyzers
