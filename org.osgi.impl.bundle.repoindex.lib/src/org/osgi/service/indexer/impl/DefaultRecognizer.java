@@ -48,8 +48,21 @@ public class DefaultRecognizer implements ResourceRecognizer {
 		}
 		if (resource == null) {
 			resource = new FileResource(file);
-			resource.getProperties().put(Resource.MIMETYPE, MimeType.Unknown.toString());
+			resource.getProperties().put(Resource.MIMETYPE, detectMimeType(file));
 		}
 		return resource;
+	}
+
+	private String detectMimeType(File file) {
+		String fileName = file.getName();
+		String mimeType = MimeType.Unknown.toString();
+
+		// TODO extend to a comprehensive set
+		if (fileName.endsWith(".xml")) {
+			mimeType = MimeType.Xml.toString();
+		} else if (fileName.endsWith(".json")) {
+			mimeType = MimeType.Json.toString();
+		}
+		return mimeType;
 	}
 }
