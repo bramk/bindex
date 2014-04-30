@@ -110,6 +110,14 @@ public class TestIndexer extends TestCase {
 		assertFragmentMatch("testdata/fragment-scr1_2.txt", "testdata/scr1_2.jar");
 	}
 
+	public void testFragmentMetaTypeFileWithoutVersion() throws Exception {
+		assertFragmentMatch("testdata/fragment-21.txt", "testdata/21-metatypefile.xml");
+	}
+
+	public void testFragmentJSonFileWithVersion() throws Exception {
+		assertFragmentMatch("testdata/fragment-22.txt", "testdata/22-jsonfile-1.1.1.json");
+	}
+
 	private static void assertFragmentMatch(String expectedPath, String jarPath) throws Exception {
 		RepoIndex indexer = new RepoIndex();
 		assertFragmentMatch(indexer, expectedPath, jarPath);

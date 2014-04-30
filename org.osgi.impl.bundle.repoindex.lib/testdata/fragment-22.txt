@@ -1,0 +1,13 @@
+<resource>
+  <capability namespace="osgi.identity">
+    <attribute name="osgi.identity" value="22-jsonfile"/>
+    <attribute name="type" value="file"/>
+    <attribute name="version" type="Version" value="1.1.1"/>
+  </capability>
+  <capability namespace="osgi.content">
+    <attribute name="osgi.content" value="b14dd7d8007299424e64694e90129b3d6f618634cd9c73cae40d38569384584f"/>
+    <attribute name="url" value="testdata/22-jsonfile-1.1.1.json"/>
+    <attribute name="size" type="Long" value="582"/>
+    <attribute name="mime" value="application/json"/>
+  </capability>
+</resource>
