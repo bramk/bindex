@@ -99,6 +99,7 @@ public class RepoIndex implements ResourceIndexer {
 		this.defaultAnalyzer = new DefaultAnalyzer(log);
 
 		addRecognizer(new DefaultRecognizer(log));
+		addRecognizer(new MetaTypeRecognizer(log));
 		try {
 			Filter jarFilter = createFilter("(|(" + Resource.MIMETYPE + "=" + MimeType.Jar.toString() + ")(" + Resource.MIMETYPE + "=" + MimeType.Bundle.toString() + "))");
 			Filter fileFilter = createFilter("(!(|(" + Resource.MIMETYPE + "=" + MimeType.Jar.toString() + ")(" + Resource.MIMETYPE + "=" + MimeType.Bundle.toString() + ")))");
