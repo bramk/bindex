@@ -1,6 +1,5 @@
 package org.osgi.service.indexer;
 
-
 /**
  * Predefined namespaces
  */
@@ -34,6 +33,7 @@ public final class Namespaces {
 	public static final String RESOURCE_TYPE_BUNDLE = "osgi.bundle";
 	public static final String RESOURCE_TYPE_FRAGMENT = "osgi.fragment";
 	public static final String RESOURCE_TYPE_PLAIN_JAR = "jarfile";
+	public static final String RESOURCE_TYPE_PLAIN_FILE = "file";
 
 	/** Content attributes */
 	public static final String ATTR_CONTENT_URL = "url";

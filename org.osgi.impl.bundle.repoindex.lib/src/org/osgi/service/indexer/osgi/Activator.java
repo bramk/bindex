@@ -9,6 +9,7 @@ import org.osgi.service.indexer.impl.RepoIndex;
 public class Activator implements BundleActivator {
 
 	private LogTracker logTracker;
+	private RecognizerTracker recognizerTracker;
 	private AnalyzerTracker analyzerTracker;
 
 	private ServiceRegistration registration;
@@ -19,6 +20,9 @@ public class Activator implements BundleActivator {
 
 		RepoIndex indexer = new RepoIndex(logTracker);
 
+		recognizerTracker = new RecognizerTracker(context, indexer);
+		recognizerTracker.open();
+
 		analyzerTracker = new AnalyzerTracker(context, indexer, logTracker);
 		analyzerTracker.open();
 
@@ -27,6 +31,7 @@ public class Activator implements BundleActivator {
 
 	public void stop(BundleContext context) throws Exception {
 		registration.unregister();
+		recognizerTracker.close();
 		analyzerTracker.close();
 		logTracker.close();
 	}
