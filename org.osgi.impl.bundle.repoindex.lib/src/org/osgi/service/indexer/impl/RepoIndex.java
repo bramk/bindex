@@ -129,7 +129,7 @@ public class RepoIndex implements ResourceIndexer {
 
 	/**
 	 * @param analyzer
-	 *            the analyzer to add
+	 *            the analyzer to remove
 	 * @param filter
 	 *            the filter that determines which resources can be analyzed
 	 */
